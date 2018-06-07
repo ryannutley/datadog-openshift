@@ -1,0 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: datadog-agent-config
+  namespace: datadog
+data:
+  datadog.yaml: |
+    listeners:
+      - name: kubelet
+    config_providers:
+      - name: kubelet
+        polling: true
+    proxy:
+      http: http://xxxxxxxx.com:80
+      https: https://xxxxxxxx.com:80
+      no_proxy:
+        - localhost
+        - XXX.XXX.XXX.XXX
+        - 127.0.0.1
