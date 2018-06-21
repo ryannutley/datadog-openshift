@@ -46,10 +46,10 @@ Create a config map for adding custom configs to the agent
 ./oc create -f manifests/datadog-configMap.yaml
 ```
 
-Ensure the security constraints are applied to the datadog user
+<!-- Ensure the security constraints are applied to the datadog user
 ```
 ./oc adm policy add-scc-to-user privileged -n %%NAMESPACE%% -z datadog
-```
+``` -->
 
 Create the daemonset from manifest
 ```
