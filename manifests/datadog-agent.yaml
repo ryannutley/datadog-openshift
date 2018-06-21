@@ -38,14 +38,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.hostIP
-
-          # - name: DD_KUBELET_CLIENT_CRT
-          #   value: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-
-          # - name: PROXY_HOST
-          #   value: lnp6proxy.markit.partners
-          # - name: PROXY_PORT
-          #   value: "80"
         resources:
           requests:
             memory: "256Mi"
