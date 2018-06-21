@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+yum update -y
+yum install -y wget git net-tools bind-utils iptables-services bridge-utils bash-completion

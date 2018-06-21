@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+
+docker run -d --name "origin"  --restart always --privileged --pid=host --net=host \
+-v /:/rootfs:ro -v /var/run:/var/run:rw -v /sys:/sys -v /sys/fs/cgroup:/sys/fs/cgroup:rw -v /var/lib/docker:/var/lib/docker:rw -v /var/lib/origin/openshift.local.volumes:/var/lib/origin/openshift.local.volumes:rslave \
+openshift/origin:v3.7.1 start --public-master="https://192.168.33.22:8443"
+
+echo "Waiting for OpenShift to start..."
+for i in $(seq 1 60); do
+    docker exec origin oc whoami 2>&1 > /dev/null && break
+    sleep 5
+done
+
+docker exec origin oc adm policy add-cluster-role-to-user cluster-admin system
+
+echo ""
+echo "All good, you can open your browser to https://192.168.33.22:8443, and setup the cli client with:"
+echo "oc login https://192.168.33.22:8443 -u system -p admin"
