@@ -15,27 +15,42 @@ This user is has the cluster-admin role, so everything should work. If you need 
 `sudo docker exec -it origin bash`
 
 # Install
+Create security constraints
 `./oc create -f manifests/datadog-securityConstraints.yaml`
+
+Create a service account
 `./oc create -f manifests/datadog-serviceAccount.yaml`
+
+Create a cluster role
 `./oc create -f manifests/datadog-clusterRole.yaml`
+
+Bind the cluster role to service account
 `./oc create -f manifests/datadog-clusterRoleBinding.yaml`
+
+Create a config map for adding custom configs to the agent
 `./oc create -f manifests/datadog-configMap.yaml`
+
+Ensure the security constraints are applied to the datadog user
 `./oc adm policy add-scc-to-user privileged -n {NAMESPACE} -z datadog`
+
+Create the daemonset from manifest
 `./oc create -f manifests/datadog-agent.yaml`
 
+Check the pods are running as expected
 `./oc get pods`
 
-`
-NAME            READY     STATUS    RESTARTS   AGE
-datadog-pgtm5   1/1       Running   0          11m
-`
+Output should look similar to the following
+`NAME            READY     STATUS    RESTARTS   AGE
+datadog-pgtm5   1/1       Running   0          11m`
 
+We can bash into the pod then to check the agent
 `./oc exec -it datadog-pgtm5 bash`
 
+You will see something like this, type in the commany "agent diagnose"
 `I have no name!@datadog-pgtm5:/$ agent diagnose`
 
-`
-=== Running ECS Fargate Metadata availability diagnosis ===
+The output should look similar to the following:
+`=== Running ECS Fargate Metadata availability diagnosis ===
 [ERROR] error: Get http://169.254.170.2/v2/metadata: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers) - 1529570640384116234
 ===> FAIL
 
@@ -72,5 +87,4 @@ datadog-pgtm5   1/1       Running   0          11m
 === Running ECS Metadata availability diagnosis ===
 2018-06-21 08:44:00 UTC | INFO | (diagnosis.go:33 in diagnose) | successfully got hostname "oshift-ryan.nutley" from docker
 [ERROR] error: temporary failure in ecsutil, will retry later: Error: No such container: ecs-agent - 1529570640835827549
-===> FAIL
-`
+===> FAIL`
