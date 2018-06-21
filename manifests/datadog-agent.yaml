@@ -1,0 +1,86 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: datadog
+  namespace: %%NAMESPACE%%
+spec:
+  template:
+    metadata:
+      labels:
+        app: datadog
+      name: datadog
+    spec:
+      serviceAccount: datadog
+      serviceAccountName: datadog
+      containers:
+      - image: datadog/agent:latest
+        imagePullPolicy: Always
+        name: datadog
+        ports:
+          - containerPort: 8125
+            name: dogstatsdport
+            protocol: UDP
+        env:
+          - name: DD_API_KEY
+            value: %%API_KEY%%
+
+          - name: DD_TAGS
+            value: static_tag tag_key:tag_value
+
+          - name: DOCKER_DD_AGENT
+            value: "yes"
+
+          - name: DD_COLLECT_KUBERNETES_EVENTS
+            value: "true"
+          - name: KUBERNETES
+            value: "yes"
+          - name: DD_KUBERNETES_KUBELET_HOST
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+
+          # - name: DD_KUBELET_CLIENT_CRT
+          #   value: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+          # - name: PROXY_HOST
+          #   value: lnp6proxy.markit.partners
+          # - name: PROXY_PORT
+          #   value: "80"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        volumeMounts:
+          - name: dockersocket
+            mountPath: /var/run/docker.sock
+          - name: procdir
+            mountPath: /host/proc
+            readOnly: true
+          - name: cgroups
+            mountPath: /host/sys/fs/cgroup
+            readOnly: true
+          - name: datadog-config
+            mountPath: /conf.d
+        livenessProbe:
+          exec:
+            command:
+            - ./probe.sh
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 5
+      volumes:
+        - hostPath:
+            path: /var/run/docker.sock
+          name: dockersocket
+        - hostPath:
+            path: /proc
+          name: procdir
+        - hostPath:
+            path: /sys/fs/cgroup
+          name: cgroups
+        - name: datadog-config
+          configMap:
+            name: datadog-config

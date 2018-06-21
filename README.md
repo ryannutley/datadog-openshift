@@ -19,6 +19,8 @@ sudo docker exec -it origin bash
 ```
 
 # Install
+For each file in manifests, replace %%NAMESPACE%% with your project namespace, and replace %%API_KEY%% with your Datadog API key. Also be sure to put your tags into the `datadog-agent.yaml` file so they come into Datadog.
+
 Create security constraints
 ```
 ./oc create -f manifests/datadog-securityConstraints.yaml
@@ -30,7 +32,8 @@ Create a service account
 ```
 
 Create a cluster role
-```./oc create -f manifests/datadog-clusterRole.yaml
+```
+./oc create -f manifests/datadog-clusterRole.yaml
 ```
 
 Bind the cluster role to service account
@@ -45,7 +48,7 @@ Create a config map for adding custom configs to the agent
 
 Ensure the security constraints are applied to the datadog user
 ```
-./oc adm policy add-scc-to-user privileged -n {NAMESPACE} -z datadog
+./oc adm policy add-scc-to-user privileged -n %%NAMESPACE%% -z datadog
 ```
 
 Create the daemonset from manifest

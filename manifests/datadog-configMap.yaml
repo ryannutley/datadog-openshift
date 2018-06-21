@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-config
+  namespace: %%NAMESPACE%%
+data:
+  datadog.yaml: |
+    listeners:
+      - name: kubelet
+    config_providers:
+      - name: kubelet
+        polling: true
+    tags:
+      - tag_name:tag_value
